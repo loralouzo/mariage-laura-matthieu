@@ -1,0 +1,269 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;600&display=swap');
+
+:root{
+  --bg-beige: #f7f3ee;      /* très clair */
+  --sage: #9bb7a6;          /* vert d'eau doux */
+  --gold: #c89a4a;          /* doré chaud */
+  --text-dark: #3b2f2a;
+  --muted: #6b665f;
+  --card-bg: rgba(255,255,255,0.85);
+}
+
+/* reset */
+html,body,#root {
+  height: 100%;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: var(--bg-beige);
+  color:var(--text-dark);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* global headings */
+h1, h2, h3 { font-family: "Playfair Display", serif; color:var(--text-dark); }
+p { color:var(--muted); line-height:1.6; }
+
+/* --- HOME PAGE BACKGROUND WRAPPER --- */
+.hero {
+  min-height: 100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+  padding:6rem 1rem;
+  background-image:
+    radial-gradient(rgba(255,255,255,0.55), rgba(255,255,255,0.55)),
+    url('/floral.png'); /* subtle floral texture full-screen */
+  background-size: cover;
+  background-position: center;
+}
+
+/* watermark couple centered faint */
+.hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image: url('/couple.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 60vmin; /* adjust size */
+  opacity: 0.5; /* watermark intensity */
+  pointer-events:none;
+  z-index:0;
+  filter: contrast(100%) saturate(0.9);
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.256);
+  z-index: 0;
+  display: none !important; /* si nécessaire */
+}
+
+
+/* hero content */
+.hero .content{
+  position:relative;
+  z-index:1;
+  max-width:900px;
+  width:100%;
+  padding:4rem 2rem;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:1.2rem;
+}
+
+/* elegant title */
+.title{
+  font-size:clamp(2.2rem, 4.5vw, 4.2rem);
+  letter-spacing: -.02em;
+  color: var(--text-dark);
+  font-weight:600;
+  text-shadow: 0 2px 0 rgba(0,0,0,0.02);
+}
+
+/* subtitle */
+.lead{
+  margin:0;
+  font-size:1.05rem;
+  color:var(--muted);
+}
+
+/* button */
+.hero .cta{
+  display:inline-block;
+  margin-top:1rem;
+  padding:0.9rem 2rem;
+  background: linear-gradient(180deg, #e0b76a, #c89a4a);
+  color: #fff;
+  border-radius:999px;
+  font-weight:600;
+  box-shadow: 0 10px 24px rgba(200,150,70,0.18);
+  text-decoration:none;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.hero .cta:hover{ transform: translateY(-4px); box-shadow: 0 18px 40px rgba(200,150,70,0.22); }
+
+/* --- RSVP FORM PAGE --- */
+.rsvp-wrap{
+  min-height: 100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:6rem 1rem;
+  position:relative;
+  background: var(--bg-beige);
+}
+
+/* keep floral but more subtle */
+.rsvp-wrap::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image: url('/floral.png');
+  background-position: center;
+  background-size: cover;
+  opacity: 0.05;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* form card */
+.form-card{
+  width: min(960px, 96%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.88));
+  border-radius:16px;
+  padding:2.2rem;
+  box-shadow: 0 10px 30px rgba(20,20,20,0.08);
+  position:relative;
+  z-index:1;
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:1.4rem;
+  align-items:start;
+  overflow:hidden;
+}
+
+/* header of form card */
+.form-header{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:.4rem;
+}
+.form-header h2{ margin:0; font-size:2rem; }
+.form-header p{ margin:0; color:var(--muted) }
+
+/* form layout */
+.rsvp-form{
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:1rem;
+  align-items:end;
+}
+
+/* form full width elements */
+.rsvp-form .full { grid-column: 1 / -1; }
+
+/* labels style */
+.label {
+  font-size:.9rem;
+  font-weight:600;
+  color:var(--sage);
+  display:block;
+  margin-bottom:.35rem;
+  letter-spacing:.01em;
+}
+
+/* inputs */
+.input, .select, .textarea {
+  width:100%;
+  padding:.6rem .75rem;
+  border-radius:8px;
+  border:1px solid rgba(60,60,60,0.08);
+  background: rgba(255,255,255,0.98);
+  font-size:0.95rem;
+  color:var(--text-dark);
+  transition: box-shadow .18s ease, transform .12s ease, border-color .12s ease;
+}
+.input:focus, .select:focus, .textarea:focus{
+  outline:none;
+  border-color: var(--sage);
+  box-shadow: 0 6px 20px rgba(155,183,166,0.12);
+  transform: translateY(-1px);
+}
+
+/* textarea */
+.textarea { min-height:120px; resize:vertical; }
+
+/* submit button row */
+.actions{
+  display:flex;
+  gap:1rem;
+  align-items:center;
+}
+.btn-primary{
+  padding:.7rem 1.2rem;
+  background: linear-gradient(180deg,var(--gold), #b07d2e);
+  color:white;
+  font-weight:700;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+  box-shadow: 0 8px 24px rgba(184,139,59,0.18);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.btn-primary:hover{ transform: translateY(-3px); box-shadow: 0 14px 36px rgba(184,139,59,0.22); }
+
+/* subtle decorative corners (flowers) */
+.decor-corner{
+  position:absolute;
+  width:180px;
+  height:180px;
+  opacity:0.9;
+}
+.decor-corner.left{ left:-30px; top:-30px; transform: rotate(-10deg); opacity:0.6; }
+.decor-corner.right{ right:-30px; bottom:-30px; transform: rotate(8deg); opacity:0.6; }
+
+/* confirmation message */
+.confirm {
+  padding:1rem 1.2rem;
+  background: linear-gradient(90deg, rgba(155,183,166,0.1), rgba(200,150,70,0.06));
+  border-left:4px solid var(--sage);
+  border-radius:6px;
+  color:var(--text-dark);
+}
+
+/* small animations */
+.fade-in {
+  animation: fadeIn .6s ease both;
+}
+@keyframes fadeIn {
+  from { opacity:0; transform: translateY(6px) }
+  to { opacity:1; transform: translateY(0) }
+}
+
+/* responsive */
+@media (max-width:800px){
+  .rsvp-form{ grid-template-columns: 1fr; }
+  .decor-corner{ display:none; }
+  .hero{ padding:3rem 1rem; }
+}
+/* Désactive complètement le couple en fond sur le formulaire */
+.rsvp-wrap::before,
+.rsvp-wrap::after {
+  display: none !important;
+}
+
+/* Empêche l’héritage du couple.png */
+.rsvp-wrap.hero::before {
+  background-image: none !important;
+}
