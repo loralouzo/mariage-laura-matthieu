@@ -142,11 +142,29 @@ export default function RSVP() {
             />
           </div>
 
+          {/* ⭐ Bouton uniforme style “Retour à l’accueil” */}
           <div className="col-span-2 text-center mt-4">
             <button
               type="submit"
-              className="px-10 py-3 bg-amber-600 text-white text-lg rounded-full shadow-lg hover:bg-amber-700 hover:scale-[1.03] transition-all"
               disabled={loading}
+              style={{
+                padding: "0.9rem 2.2rem",
+                background: "#c89a4a",
+                color: "#fff",
+                borderRadius: 999,
+                textDecoration: "none",
+                fontWeight: 700,
+                letterSpacing: "0.5px",
+                fontSize: "1.15rem",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                transition: "background 0.2s ease-in-out, transform 0.15s ease",
+              }}
+              onMouseOver={(e) => {
+                if (!loading) e.target.style.background = "#b38940";
+              }}
+              onMouseOut={(e) => {
+                if (!loading) e.target.style.background = "#c89a4a";
+              }}
             >
               {loading ? "Envoi…" : "Envoyer ma réponse"}
             </button>
