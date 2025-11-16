@@ -1,10 +1,18 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import supabase from "../lib/supabaseClient";
 
 export default function RSVP() {
   const router = useRouter();
+
+  // 🔒 Vérification du code secret validé
+  useEffect(() => {
+    const authorized = sessionStorage.getItem("authorized");
+    if (!authorized) {
+      router.push("/login");
+    }
+  }, [router]);
 
   const [form, setForm] = useState({
     nom: "",
@@ -12,7 +20,7 @@ export default function RSVP() {
     presence: "oui",
     adultes: 1,
     enfants: 0,
-    message: ""
+    message: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -43,11 +51,9 @@ export default function RSVP() {
       return;
     }
 
-    // ✅ REDIRECTION AVEC LE PARAMÈTRE presence
     router.push(`/confirmation?presence=${form.presence}`);
   }
 
-  /*** FORMULAIRE ***/
   return (
     <div className="hero py-20 flex justify-center relative">
       <div className="bg-white/90 backdrop-blur-md p-10 rounded-3xl shadow-2xl w-full max-w-3xl relative animate-fadein border border-amber-100">
