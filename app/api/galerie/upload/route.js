@@ -1,18 +1,40 @@
-import supabaseServer from "@/lib/supabaseServerClient"; // <-- sans accolades
+import supabaseServer from "@/lib/supabaseServerClient";
 
 export const POST = async (req) => {
   try {
-    const data = await req.formData();
-    const file = data.get("file");
+    const formData = await req.formData();
+    const file = formData.get("file");
+
+    if (!file) {
+      return new Response(
+        JSON.stringify({ error: "Aucun fichier fourni" }),
+        { status: 400 }
+      );
+    }
+
+    const fileName = file.name;
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
 
     const { error } = await supabaseServer
       .storage
-      .from("photos")
-      .upload(file.name, file);
+      .from("galerie") // nom exact du bucket
+      .upload(fileName, fileBuffer, { cacheControl: "3600", upsert: false });
 
-    if (error) return new Response(JSON.stringify({ error: error.message }), { status: 400 });
-    return new Response(JSON.stringify({ message: "Upload réussi !" }), { status: 200 });
+    if (error) {
+      return new Response(
+        JSON.stringify({ error: error.message }),
+        { status: 500 }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({ message: "Upload réussi !" }),
+      { status: 200 }
+    );
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+    return new Response(
+      JSON.stringify({ error: err.message }),
+      { status: 500 }
+    );
   }
 };
