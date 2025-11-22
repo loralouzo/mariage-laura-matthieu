@@ -7,11 +7,13 @@ export default function Login() {
   const [error, setError] = useState(false);
   const router = useRouter();
 
-  const correctCode = "LilouZoëGabin"; // 🔐 Code unique
+  // 🔐 CODE UNIQUE POUR TOUTES LES PAGES (RSVP + GALERIE)
+  const correctCode = "LilouZoëGabin";
 
   function verifierCode() {
     if (code.trim() === correctCode) {
-      sessionStorage.setItem("authorized", "true");
+      // on stocke le vrai code → utilisable dans la galerie
+      sessionStorage.setItem("authorized", code);
       router.push("/rsvp?code=" + encodeURIComponent(code));
     } else {
       setError(true);
@@ -38,7 +40,7 @@ export default function Login() {
           onChange={(e) => setCode(e.target.value)}
         />
 
-        {/* 🚀 Nouveau bouton identique à celui de l’accueil */}
+        {/* 🌟 BOUTON IDENTIQUE À CELUI DE L’ACCUEIL */}
         <button
           onClick={verifierCode}
           style={{
@@ -52,16 +54,20 @@ export default function Login() {
             fontWeight: 700,
             letterSpacing: "0.5px",
             boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-            transition: "background 0.2s ease-in-out",
+            transition: "background 0.2s ease-in-out, transform 0.1s ease-in-out",
           }}
           onMouseOver={(e) => (e.target.style.background = "#b38940")}
           onMouseOut={(e) => (e.target.style.background = "#c89a4a")}
+          onMouseDown={(e) => (e.target.style.transform = "scale(0.97)")}
+          onMouseUp={(e) => (e.target.style.transform = "scale(1)")}
         >
           Valider
         </button>
 
         {error && (
-          <p className="text-red-600 mt-4">Code incorrect. Merci de réessayer.</p>
+          <p className="text-red-600 mt-4">
+            Code incorrect. Merci de réessayer.
+          </p>
         )}
       </div>
     </div>
