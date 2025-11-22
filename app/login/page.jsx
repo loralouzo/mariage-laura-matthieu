@@ -1,50 +1,89 @@
 "use client";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 
-export default function LoginPage() {
-  const router = useRouter();
+export default function Login() {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const CORRECT_CODE = "LilouZoëGabin";
+
     if (code === CORRECT_CODE) {
       sessionStorage.setItem("authorized", code);
-      router.push("/galerie");
+      router.push("/"); // redirige vers l’accueil
     } else {
-      setError("Code invalide");
+      setError("Code incorrect");
     }
   };
 
   return (
     <main
-      className="min-h-screen flex items-center justify-center p-8"
       style={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         backgroundImage: "url('/floral.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
+        padding: "2rem",
       }}
     >
-      <div className="bg-white/85 p-8 rounded-3xl shadow-xl max-w-md w-full text-center backdrop-blur-sm border border-amber-200">
-        <h1 className="text-2xl font-bold mb-4">Connexion Admin</h1>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <div
+        style={{
+          background: "rgba(255,255,255,0.85)",
+          backdropFilter: "blur(6px)",
+          borderRadius: "24px",
+          padding: "3rem",
+          boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+          maxWidth: "400px",
+          width: "100%",
+          textAlign: "center",
+          border: "1px solid rgba(200,170,120,0.4)",
+        }}
+      >
+        <h1
+          style={{
+            fontFamily: "Playfair Display, serif",
+            fontSize: "2rem",
+            marginBottom: "1rem",
+          }}
+        >
+          Connexion Admin
+        </h1>
+        {error && (
+          <div style={{ color: "red", marginBottom: "1rem" }}>{error}</div>
+        )}
+        <form onSubmit={handleSubmit}>
           <input
             type="password"
-            placeholder="Entrez le code"
+            placeholder="Code admin"
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            className="p-3 rounded-lg border"
+            style={{
+              width: "100%",
+              padding: "0.8rem",
+              marginBottom: "1rem",
+              borderRadius: "8px",
+              border: "1px solid #ccc",
+            }}
           />
-          {error && <div className="text-red-600">{error}</div>}
           <button
             type="submit"
-            className="bg-amber-500 text-white py-2 rounded-xl hover:scale-105 transition"
+            style={{
+              padding: "0.8rem 2rem",
+              background: "#c89a4a",
+              color: "#fff",
+              borderRadius: 999,
+              fontWeight: 700,
+              width: "100%",
+            }}
           >
-            Se connecter
+            Valider
           </button>
         </form>
       </div>

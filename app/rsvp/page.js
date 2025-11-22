@@ -1,17 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import supabase from "../lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function RSVP() {
   const router = useRouter();
 
-  // 🔒 Vérification du code secret validé
   useEffect(() => {
     const authorized = sessionStorage.getItem("authorized");
-    if (!authorized) {
-      router.push("/login");
-    }
+    if (!authorized) router.push("/login");
   }, [router]);
 
   const [form, setForm] = useState({
@@ -22,23 +19,17 @@ export default function RSVP() {
     enfants: 0,
     message: "",
   });
-
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  async function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setErrorMsg("");
 
     const { error } = await supabase.from("reponses_mariage").insert([
       {
-        nom: form.nom,
-        prenom: form.prenom,
-        presence: form.presence,
-        adultes: form.adultes,
-        enfants: form.enfants,
-        message: form.message,
+        ...form,
         created_at: new Date().toISOString(),
       },
     ]);
@@ -46,131 +37,122 @@ export default function RSVP() {
     setLoading(false);
 
     if (error) {
-      console.log("SUPABASE ERROR:", JSON.stringify(error, null, 2));
       setErrorMsg("Une erreur est survenue. Merci de réessayer.");
       return;
     }
 
-    router.push(`/confirmation?presence=${form.presence}`);
-  }
+    router.push(`/confirm?presence=${form.presence}`);
+  };
 
   return (
-    <div className="hero py-20 flex justify-center relative">
-      <div className="bg-white/90 backdrop-blur-md p-10 rounded-3xl shadow-2xl w-full max-w-3xl relative animate-fadein border border-amber-100">
-
-        <h1 className="text-3xl font-semibold text-center mb-2 text-gray-800 tracking-tight">
+    <main
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundImage: "url('/floral.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        padding: "2rem",
+      }}
+    >
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          background: "rgba(255,255,255,0.85)",
+          backdropFilter: "blur(6px)",
+          borderRadius: "24px",
+          padding: "3rem",
+          maxWidth: "500px",
+          width: "100%",
+          boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+          border: "1px solid rgba(200,170,120,0.4)",
+          display: "grid",
+          gap: "1rem",
+        }}
+      >
+        <h1
+          style={{
+            fontFamily: "Playfair Display, serif",
+            fontSize: "2rem",
+            marginBottom: "1rem",
+            textAlign: "center",
+          }}
+        >
           Réponse à l’invitation
         </h1>
 
-        <p className="text-center text-gray-600 mb-8">
-          Merci de confirmer ta présence 🤎
-        </p>
-
         {errorMsg && (
-          <div className="mb-4 text-center text-red-600 font-semibold">
-            {errorMsg}
-          </div>
+          <div style={{ color: "red", textAlign: "center" }}>{errorMsg}</div>
         )}
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
+        <input
+          placeholder="Nom"
+          required
+          value={form.nom}
+          onChange={(e) => setForm({ ...form, nom: e.target.value })}
+          style={{ padding: "0.7rem", borderRadius: "8px", border: "1px solid #ccc" }}
+        />
+        <input
+          placeholder="Prénom"
+          required
+          value={form.prenom}
+          onChange={(e) => setForm({ ...form, prenom: e.target.value })}
+          style={{ padding: "0.7rem", borderRadius: "8px", border: "1px solid #ccc" }}
+        />
 
-          <div>
-            <label className="label">Nom</label>
-            <input
-              className="input"
-              required
-              value={form.nom}
-              onChange={(e) => setForm({ ...form, nom: e.target.value })}
-            />
-          </div>
+        <input
+          type="number"
+          min="0"
+          value={form.adultes}
+          onChange={(e) => setForm({ ...form, adultes: Number(e.target.value) })}
+          placeholder="Nombre d’adultes"
+          style={{ padding: "0.7rem", borderRadius: "8px", border: "1px solid #ccc" }}
+        />
 
-          <div>
-            <label className="label">Prénom</label>
-            <input
-              className="input"
-              required
-              value={form.prenom}
-              onChange={(e) => setForm({ ...form, prenom: e.target.value })}
-            />
-          </div>
+        <input
+          type="number"
+          min="0"
+          value={form.enfants}
+          onChange={(e) => setForm({ ...form, enfants: Number(e.target.value) })}
+          placeholder="Nombre d’enfants"
+          style={{ padding: "0.7rem", borderRadius: "8px", border: "1px solid #ccc" }}
+        />
 
-          <div>
-            <label className="label">Nombre d’adultes</label>
-            <input
-              className="input"
-              type="number"
-              min="0"
-              value={form.adultes}
-              onChange={(e) =>
-                setForm({ ...form, adultes: Number(e.target.value) })
-              }
-            />
-          </div>
+        <select
+          value={form.presence}
+          onChange={(e) => setForm({ ...form, presence: e.target.value })}
+          style={{ padding: "0.7rem", borderRadius: "8px", border: "1px solid #ccc" }}
+        >
+          <option value="oui">Je serai présent(e)</option>
+          <option value="non">Je ne pourrai pas venir</option>
+        </select>
 
-          <div>
-            <label className="label">Nombre d’enfants</label>
-            <input
-              className="input"
-              type="number"
-              min="0"
-              value={form.enfants}
-              onChange={(e) =>
-                setForm({ ...form, enfants: Number(e.target.value) })
-              }
-            />
-          </div>
+        <textarea
+          value={form.message}
+          onChange={(e) => setForm({ ...form, message: e.target.value })}
+          placeholder="Message (facultatif)"
+          style={{ padding: "0.7rem", borderRadius: "8px", border: "1px solid #ccc", minHeight: "100px" }}
+        />
 
-          <div className="col-span-2">
-            <label className="label">Présence</label>
-            <select
-              className="input"
-              value={form.presence}
-              onChange={(e) => setForm({ ...form, presence: e.target.value })}
-            >
-              <option value="oui">Je serai présent(e)</option>
-              <option value="non">Je ne pourrai pas venir</option>
-            </select>
-          </div>
-
-          <div className="col-span-2">
-            <label className="label">Message (facultatif)</label>
-            <textarea
-              className="input h-28"
-              placeholder="Un mot pour les mariés…"
-              value={form.message}
-              onChange={(e) => setForm({ ...form, message: e.target.value })}
-            />
-          </div>
-
-          {/* ⭐ Bouton uniforme style “Retour à l’accueil” */}
-          <div className="col-span-2 text-center mt-4">
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                padding: "0.9rem 2.2rem",
-                background: "#c89a4a",
-                color: "#fff",
-                borderRadius: 999,
-                textDecoration: "none",
-                fontWeight: 700,
-                letterSpacing: "0.5px",
-                fontSize: "1.15rem",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                transition: "background 0.2s ease-in-out, transform 0.15s ease",
-              }}
-              onMouseOver={(e) => {
-                if (!loading) e.target.style.background = "#b38940";
-              }}
-              onMouseOut={(e) => {
-                if (!loading) e.target.style.background = "#c89a4a";
-              }}
-            >
-              {loading ? "Envoi…" : "Envoyer ma réponse"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            padding: "0.9rem 2.2rem",
+            background: "#c89a4a",
+            color: "#fff",
+            borderRadius: 999,
+            fontWeight: 700,
+            fontSize: "1.1rem",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+            transition: "background 0.2s ease",
+          }}
+        >
+          {loading ? "Envoi…" : "Envoyer ma réponse"}
+        </button>
+      </form>
+    </main>
   );
 }
