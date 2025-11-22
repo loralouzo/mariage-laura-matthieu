@@ -1,32 +1,44 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import supabaseServer from "@/lib/supabaseServerClient"; // <-- clé service role
 
 export default function Galerie() {
-  const [file, setFile] = useState(null);
-  const [message, setMessage] = useState("");
+  const [photos, setPhotos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleUpload = async (e) => {
-    e.preventDefault();
-    if (!file) return setMessage("Veuillez choisir un fichier");
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      try {
+        const { data, error } = await supabaseServer
+          .storage
+          .from("galerie") // le nom de ton bucket
+          .list("", { limit: 100, offset: 0 });
 
-    const formData = new FormData();
-    formData.append("file", file);
+        if (error) throw error;
 
-    const res = await fetch("/api/galerie/upload", {
-      method: "POST",
-      body: formData,
-    });
+        // Créer les URLs publiques pour chaque photo
+        const urls = data.map((file) =>
+          supabaseServer.storage.from("galerie").getPublicUrl(file.name).publicUrl
+        );
 
-    const data = await res.json();
-    setMessage(data.error || data.message);
-  };
+        setPhotos(urls);
+      } catch (err) {
+        setErrorMsg(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPhotos();
+  }, []);
 
   return (
     <main
       style={{
         minHeight: "100vh",
         display: "flex",
-        justifyContent: "center",
+        flexDirection: "column",
         alignItems: "center",
         backgroundImage: "url('/floral.png')",
         backgroundSize: "cover",
@@ -34,54 +46,46 @@ export default function Galerie() {
         padding: "2rem",
       }}
     >
-      <form
-        onSubmit={handleUpload}
+      <div
         style={{
           background: "rgba(255,255,255,0.85)",
           backdropFilter: "blur(6px)",
           borderRadius: "24px",
-          padding: "3rem",
-          maxWidth: "500px",
+          padding: "2rem",
+          maxWidth: "900px",
           width: "100%",
           boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
           border: "1px solid rgba(200,170,120,0.4)",
-          display: "grid",
-          gap: "1rem",
           textAlign: "center",
         }}
       >
-        <h1 style={{ fontFamily: "Playfair Display, serif", fontSize: "2rem" }}>
+        <h1 style={{ fontFamily: "Playfair Display, serif", fontSize: "2rem", marginBottom: "1rem" }}>
           Galerie photos
         </h1>
 
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setFile(e.target.files[0])}
-          style={{
-            padding: "0.7rem",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-          }}
-        />
-
-        <button
-          type="submit"
-          style={{
-            padding: "0.9rem 2.2rem",
-            background: "#c89a4a",
-            color: "#fff",
-            borderRadius: 999,
-            fontWeight: 700,
-            fontSize: "1.1rem",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-          }}
-        >
-          Ajouter la photo
-        </button>
-
-        {message && <p style={{ color: message.includes("erreur") ? "red" : "green" }}>{message}</p>}
-      </form>
+        {errorMsg && <div style={{ color: "red" }}>{errorMsg}</div>}
+        {loading ? (
+          <p>Chargement des photos...</p>
+        ) : (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+              gap: "1rem",
+              marginTop: "1rem",
+            }}
+          >
+            {photos.map((url, i) => (
+              <img
+                key={i}
+                src={url}
+                alt={`Photo ${i + 1}`}
+                style={{ width: "100%", borderRadius: "12px", objectFit: "cover" }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </main>
   );
 }
